@@ -133,11 +133,11 @@ class ChunkingRequestHandler(BaseHTTPRequestHandler):
     ALWAYS_SEND_SOME = False
     ALLOW_GZIP = False
     def do_GET(self):
-        self.protocol_version = b'HTTP/1.1'
+        self.protocol_version = 'HTTP/1.1'
         # send some headers
         self.send_response(200)
-        self.send_header(b'Transfer-Encoding', b'chunked')
-        self.send_header(b'Content-type', b'application/x-ugly-json-stream')
+        self.send_header('Transfer-Encoding', 'chunked')
+        self.send_header('Content-Type', 'application/x-ugly-json-stream')
 
         self.end_headers()
 
