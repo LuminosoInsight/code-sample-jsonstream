@@ -141,16 +141,14 @@ class ChunkingRequestHandler(BaseHTTPRequestHandler):
 
         self.end_headers()
 
-        def write_chunk():
+        def write_chunk(chunk):
             hex_length = '%X' % len(chunk)
             tosend = hex_length.encode('ascii') + b'\r\n' + chunk + b'\r\n'
             self.wfile.write(tosend)
 
         # get some chunks
         for chunk in chunk_generator():
-            if not chunk:
-                continue
-            write_chunk()
+            write_chunk(chunk)
 
         # Hypothetically, if the generator ever ended, we should end the stream
         # with this data. We'll never actually get here.
