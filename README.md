@@ -6,9 +6,9 @@ We're looking for someone who can handle whatever engineering challenges come ou
 
 We define an *ugly JSON stream* as a potentially infinite stream of JSON objects, sent over an HTTP connection. The JSON objects, which correspond to dictionaries in Python, appear with *no delimiter* between them. You'll need to determine from the structure of JSON where one object ends and another begins.
 
-The JSON data complies with the json.org standard. It's all generated using Python's built-in `json` module, though sometimes using non-default settings. It contains some literal Unicode characters, so it is encoded using UTF-8.
+Except for the strange stream format, this JSON data complies with the json.org standard. Each object is generated using Python's built-in `json` module, though sometimes using non-default settings. The stream contains some literal Unicode characters, so it is encoded using UTF-8.
 
-In order to provide an infinite stream, the connection uses HTTP/1.1's [chunked transfer encoding](http://en.wikipedia.org/wiki/Chunked_transfer_encoding). However, the boundaries between these chunks will be entirely unhelpful for decoding the protocol. The chunks end after a random number of bytes from 1 to 1024. They will usually end in the middle of a JSON object, and possibly even in the middle of a UTF-8 character.
+In order to provide an infinite stream, the connection uses HTTP/1.1's [chunked transfer encoding](http://en.wikipedia.org/wiki/Chunked_transfer_encoding). However, the boundaries between these chunks will be entirely unhelpful for decoding the protocol. The chunks contain a random number of bytes from 1 to 1024. They will usually end in the middle of a JSON object, and possibly even in the middle of a UTF-8 character.
 
 ## Pretty JSON streams
 
