@@ -2,6 +2,11 @@
 # coding: utf-8
 from __future__ import unicode_literals
 from __future__ import print_function
+"""
+This file runs an HTTP server on port 8001. When you connect to it, you'll
+get an infinite stream of random JSON objects, with no delimiter between them.
+"""
+
 from wsgiref.simple_server import make_server
 from wsgiref.util import setup_testing_defaults
 import random
@@ -86,7 +91,7 @@ def make_random_json():
                       separators=separators)
 
 
-def make_random_block_size():
+def make_random_chunk_size():
     choice = random.randint(0, 1)
     if choice == 0:
         return random.choice([0, 1, 4, 1024])
@@ -95,26 +100,45 @@ def make_random_block_size():
 
 
 def generate_chunks():
+    """
+    Generate an infinite, chunked stream of bytes. These bytes will form valid
+    JSON objects, but the boundaries of the chunks are not in any way aligned
+    with the boundaries of the JSON objects.
+
+    Each chunk will contain 0 to 1024 bytes, inclusive.
+    """
     random.seed(0)
     buf = b''
     while True:
-        blocksize = make_random_block_size()
-        while len(buf) < blocksize:
+        chunk_size = make_random_chunk_size()
+        while len(buf) < chunk_size:
             buf += make_random_json().encode('utf-8')
-        to_send = buf[:blocksize]
-        buf = buf[blocksize:]
+        to_send = buf[:chunk_size]
+        buf = buf[chunk_size:]
         yield to_send
 
 
 def application(environ, start_response):
+    """
+    The very simple WSGI application that runs this server.
+    """
     setup_testing_defaults(environ)
-    headers = [(str('Content-Type'), str('application/x-json-stream'))]
+
+    # You may wonder why I'm taking these strings and running them through
+    # the str() constructor.
+    #
+    # It's because WSGI requires all headers to be *native* strings -- that
+    # is, whatever type str() is in this version of Python, even if the rest
+    # of the code is set up to use Unicode by default.
+    headers = [
+        (str('Content-Type'), str('application/x-json-stream')),
+    ]
     start_response(str('200 OK'), headers)
     for chunk in generate_chunks():
         yield chunk
 
 
 if __name__ == '__main__':
-    srv = make_server('localhost', 5766, application)
+    srv = make_server('localhost', 8001, application)
     srv.serve_forever()
 
