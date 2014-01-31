@@ -5,17 +5,23 @@ from __future__ import print_function
 """
 This file runs an HTTP server on port 8001. When you connect to it, you'll
 get an infinite stream of random JSON objects, with no delimiter between them.
+
+The stream is in HTTP 1.1 chunked transfer encoding, which any reasonable
+HTTP client should be able to handle. The boundaries between chunks will be
+extremely unhelpful, however. The chunks end after a random number of bytes
+from 1 to 1024. They will usually end in the middle of a JSON object, and
+possibly even in the middle of a UTF-8 character.
 """
 
-from wsgiref.simple_server import make_server
-from wsgiref.util import setup_testing_defaults
 import random
 import json
 import sys
 
-
 if sys.version_info.major >= 3:
     unichr = chr
+    from http.server import HTTPServer, BaseHTTPRequestHandler
+else:
+    from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
 
 def make_random_characters():
@@ -94,9 +100,9 @@ def make_random_json():
 def make_random_chunk_size():
     choice = random.randint(0, 1)
     if choice == 0:
-        return random.choice([0, 1, 4, 1024])
+        return random.choice([1, 2, 4, 1024])
     else:
-        return random.randint(0, 1024)
+        return random.randint(1, 1024)
 
 
 def generate_chunks():
@@ -105,7 +111,7 @@ def generate_chunks():
     JSON objects, but the boundaries of the chunks are not in any way aligned
     with the boundaries of the JSON objects.
 
-    Each chunk will contain 0 to 1024 bytes, inclusive.
+    Each chunk will contain 1 to 1024 bytes, inclusive.
     """
     random.seed(0)
     buf = b''
@@ -118,27 +124,47 @@ def generate_chunks():
         yield to_send
 
 
-def application(environ, start_response):
-    """
-    The very simple WSGI application that runs this server.
-    """
-    setup_testing_defaults(environ)
+class ChunkingRequestHandler(BaseHTTPRequestHandler):
+    '''
+    A simple HTTP server that serves HTTP 1.1 chunked encoding.
 
-    # You may wonder why I'm taking these strings and running them through
-    # the str() constructor.
-    #
-    # It's because WSGI requires all headers to be *native* strings -- that
-    # is, whatever type str() is in this version of Python, even if the rest
-    # of the code is set up to use Unicode by default.
-    headers = [
-        (str('Content-Type'), str('application/x-json-stream')),
-    ]
-    start_response(str('200 OK'), headers)
+    Based loosely on a public-domain Github Gist by Josiah Carlson:
+    https://gist.github.com/josiahcarlson/3250376
+    '''
+    ALWAYS_SEND_SOME = False
+    ALLOW_GZIP = False
+    def do_GET(self):
+        self.protocol_version = b'HTTP/1.1'
+        # send some headers
+        self.send_response(200)
+        self.send_header(b'Transfer-Encoding', b'chunked')
+        self.send_header(b'Content-type', b'application/x-ugly-json-stream')
+
+        self.end_headers()
+
+        def write_chunk():
+            hex_length = '%X' % len(chunk)
+            tosend = hex_length.encode('ascii') + b'\r\n' + chunk + b'\r\n'
+            self.wfile.write(tosend)
+
+        # get some chunks
+        for chunk in chunk_generator():
+            if not chunk:
+                continue
+            write_chunk()
+
+        # Hypothetically, if the generator ever ended, we should end the stream
+        # with this data. We'll never actually get here.
+        self.wfile.write(b'0\r\n\r\n')
+
+
+def chunk_generator():
+    # generate some chunks
     for chunk in generate_chunks():
         yield chunk
 
 
 if __name__ == '__main__':
-    srv = make_server('localhost', 8001, application)
-    srv.serve_forever()
+    server = HTTPServer(('127.0.0.1', 8001), ChunkingRequestHandler)
+    server.serve_forever()
 
