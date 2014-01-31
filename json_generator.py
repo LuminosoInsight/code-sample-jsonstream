@@ -8,15 +8,17 @@ get an infinite stream of random JSON objects, with no delimiter between them.
 
 The stream is in HTTP 1.1 chunked transfer encoding, which any reasonable
 HTTP client should be able to handle. The boundaries between chunks will be
-extremely unhelpful, however. The chunks end after a random number of bytes
-from 1 to 1024. They will usually end in the middle of a JSON object, and
-possibly even in the middle of a UTF-8 character.
+extremely unhelpful, however.
+
+This code will run in Python 2.7 or 3.3, and possibly also in Python 3.2.
 """
 
 import random
 import json
 import sys
 
+
+# Handle version differences between Python 2 and 3
 if sys.version_info.major >= 3:
     unichr = chr
     from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -130,8 +132,6 @@ class ChunkingRequestHandler(BaseHTTPRequestHandler):
     Based loosely on a public-domain Github Gist by Josiah Carlson:
     https://gist.github.com/josiahcarlson/3250376
     '''
-    ALWAYS_SEND_SOME = False
-    ALLOW_GZIP = False
     def do_GET(self):
         self.protocol_version = 'HTTP/1.1'
         # send some headers
@@ -156,7 +156,6 @@ class ChunkingRequestHandler(BaseHTTPRequestHandler):
 
 
 def chunk_generator():
-    # generate some chunks
     for chunk in generate_chunks():
         yield chunk
 
@@ -164,4 +163,3 @@ def chunk_generator():
 if __name__ == '__main__':
     server = HTTPServer(('127.0.0.1', 8001), ChunkingRequestHandler)
     server.serve_forever()
-
