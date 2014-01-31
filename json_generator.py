@@ -38,8 +38,7 @@ def make_random_scalar():
         return make_random_characters()
     else:
         return random.choice([
-            'yes', 'no', 'maybe', ':)', '', float('nan'), float('inf'),
-            float('-inf'), '🁵🂊🂇',
+            'yes', 'no', 'maybe', ':)', '', '🁵🂊🂇',
             '[{"This looks like JSON": "but it\'s actually a string"}]',
             "'", '"', "hello, world", '{', '}', '[',
             ']', "back\\slash", "\\\"\\\\", "\x00", "漢字", -1, 0, 1, 2, 3, 5,
