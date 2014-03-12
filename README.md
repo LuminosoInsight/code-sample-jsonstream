@@ -1,9 +1,9 @@
-# jsonstream: a coding challenge
+## jsonstream: a coding challenge
 
-We're looking for someone who can handle whatever engineering challenges come our way. This task involves a problem we've actually had to deal with in the real world: parsing JSON data that's arriving over an ugly protocol. (We've solved it by now. We want to make sure you can do the same.)
+Luminoso is looking to hire developers who can handle whatever engineering challenges come our way. This task involves a problem we've actually had to deal with in the real world: parsing JSON data that's arriving over an ugly protocol. (We've solved it by now. We want to see you do the same.)
 
 
-## Ugly JSON streams
+### Ugly JSON streams
 
 We define an *ugly JSON stream* as a potentially infinite stream of JSON objects, sent over an HTTP connection. The JSON objects, which correspond to dictionaries in Python, appear with *no delimiter* between them. You'll need to determine from the structure of JSON where one object ends and another begins.
 
@@ -16,7 +16,7 @@ This is an example of an ugly JSON stream with three objects:
     {"one": "this is the first object"}{"two": "this is the second object", "empty_list": []}{"three": 3}
 
 
-## Pretty JSON streams
+### Pretty JSON streams
 
 What we'd really like to see is a *pretty JSON stream*. A pretty JSON stream is almost the same as an ugly JSON stream, with these differences:
 
@@ -32,14 +32,14 @@ This is an example of a pretty JSON stream with three objects:
     {"three": 3}
 
 
-## The server
+### The server
 
 Running `ugly_json_server.py` will start an HTTP server on port 8001, serving an infinite stream of random data via the "ugly JSON stream" protocol.
 
 For testing purposes, you can pass `ugly_json_server.py` command-line arguments to give it a fixed random seed, or to tell it to end each response after a certain number of objects instead of continuing infinitely. Run `ugly_json_server.py --help` for more information about these command-line arguments.
 
 
-## Your task
+### Your task
 
 Your task is to write a client that connects to this server, and prints (on standard output) the pretty version of this ugly JSON stream. Keep in mind that the stream is designed not to end, although you can pass command-line arguments to the server to get finite versions for testing.
 
@@ -50,7 +50,7 @@ Keep these goals in mind:
 - Your code should be understandable and pleasant to read.
 
 
-## Submitting your code
+### Submitting your code
 
 We are a Python shop and we're best at understanding code in Python, but if you're more comfortable with a similar dynamic programming language such as Ruby or node.js, you may use that for your code sample.
 
