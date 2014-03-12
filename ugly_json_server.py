@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#!/usr/bin/env python
 # coding: utf-8
 from __future__ import unicode_literals
 from __future__ import print_function
@@ -10,13 +10,23 @@ The stream is in HTTP 1.1 chunked transfer encoding, which any reasonable
 HTTP client should be able to handle. The boundaries between chunks will be
 extremely unhelpful, however.
 
+The server can be configured with command line arguments. For information
+on these arguments, run:
+
+    ugly_json_server.py --help
+
 This code will run in Python 2.7 or 3.3, and possibly also in Python 3.2.
 """
 
 import random
 import json
+import math
 import sys
+import argparse
 
+# These might be configured by a command line parameter
+LIMIT = None
+SEED = None
 
 # Handle version differences between Python 2 and 3
 if sys.version_info.major >= 3:
@@ -27,6 +37,10 @@ else:
 
 
 def make_random_characters():
+    """
+    Return a string of random characters from anywhere in Unicode (except
+    for surrogates).
+    """
     def random_char():
         if random.randint(0, 9):
             return unichr(random.randrange(0, 0xd800))
@@ -36,6 +50,9 @@ def make_random_characters():
 
 
 def make_random_scalar():
+    """
+    Return a random value that doesn't contain other values.
+    """
     if random.random() < 0.2:
         return make_random_characters()
     else:
@@ -44,33 +61,48 @@ def make_random_scalar():
             '[{"This looks like JSON": "but it\'s actually a string"}]',
             "'", '"', "hello, world", '{', '}', '[',
             ']', "back\\slash", "\\\"\\\\", "\x00", "漢字", -1, 0, 1, 2, 3, 5,
-            8, 0.0, 10000, 3.14159, 6.02e23, 1e-30, True, False, None
+            8, 0.0, 10000, 2 * math.pi, 6.02e23, 1e-30, True, False, None
         ])
 
 
 def make_random_string():
+    """
+    Return a randomly-chosen string.
+    """
     if random.random() < 0.2:
         return make_random_characters()
     else:
         return random.choice([
-            '', 'a', 'um', 'foo', 'quack', ',', ':', '"',
+            '', 'a', 'um', 'foo', 'quack', ',', ':', '"', "}{",
         ])
 
 
 def make_random_dict(depth=0):
+    """
+    Return a dictionary from random strings to random values. The number of
+    values decreases as the recursive 'depth' increases, so that this process
+    terminates.
+    """
     maxlength = max(10 - depth, 1)
     length = random.randint(0, maxlength)
-    return {make_random_string(): make_random_value(depth + i)
+    return {make_random_string(): make_random_value(depth + i + 1)
             for i in range(length)}
 
 
 def make_random_list(depth=0):
+    """
+    Return a list of random values. The number of values decreases as the
+    recursive 'depth' increases, so that this process terminates.
+    """
     maxlength = max(10 - depth, 1)
     length = random.randint(0, maxlength)
-    return [make_random_value(depth + i) for i in range(length)]
+    return [make_random_value(depth + i + 1) for i in range(length)]
 
 
 def make_random_value(depth=0):
+    """
+    Return a random list, dictionary, or scalar value.
+    """
     choice = random.randint(0, 4)
     if choice == 1:
         return make_random_list(depth)
@@ -81,6 +113,10 @@ def make_random_value(depth=0):
 
 
 def make_random_json():
+    """
+    Generate a random dictionary, encode it as JSON with random settings,
+    and return that JSON string.
+    """
     value = make_random_dict()
     indent = random.choice([None, None, None, None, None, None, 1, 2])
     ensure_ascii = random.choice([True, False])
@@ -106,20 +142,29 @@ def make_random_chunk_size():
         return random.randint(1, 1024)
 
 
-def generate_chunks():
+def generate_chunks(limit=None, seed=None):
     """
-    Generate an infinite, chunked stream of bytes. These bytes will form valid
+    Generate a chunked stream of bytes. These bytes will form valid
     JSON objects, but the boundaries of the chunks are not in any way aligned
     with the boundaries of the JSON objects.
 
     Each chunk will contain 1 to 1024 bytes, inclusive.
+
+    If `limit` is specified, it will stop after `limit` JSON objects. Otherwise,
+    the stream will be infinite.
     """
-    random.seed(0)
     buf = b''
-    while True:
+    count = 0
+    if seed is not None:
+        random.seed(seed)
+
+    under_limit = True
+    while under_limit or len(buf) > 0:
         chunk_size = make_random_chunk_size()
-        while len(buf) < chunk_size:
+        while len(buf) < chunk_size and under_limit:
             buf += make_random_json().encode('utf-8')
+            count += 1
+            under_limit = (limit is None or count < limit)
         to_send = buf[:chunk_size]
         buf = buf[chunk_size:]
         yield to_send
@@ -147,19 +192,21 @@ class ChunkingRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(tosend)
 
         # get some chunks
-        for chunk in chunk_generator():
+        for chunk in generate_chunks(LIMIT, SEED):
             write_chunk(chunk)
 
-        # Hypothetically, if the generator ever ended, we should end the stream
-        # with this data. We'll never actually get here.
+        # If the generator ends, write the final HTTP chunk
         self.wfile.write(b'0\r\n\r\n')
 
 
-def chunk_generator():
-    for chunk in generate_chunks():
-        yield chunk
-
-
 if __name__ == '__main__':
-    server = HTTPServer(('127.0.0.1', 8001), ChunkingRequestHandler)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", help="set the port number to serve on", type=int, default=8001)
+    parser.add_argument("--seed", help="set the random seed", type=int)
+    parser.add_argument("--limit", help="send only this many objects per connection", type=int)
+    args = parser.parse_args()
+    SEED = args.seed
+    LIMIT = args.limit
+    server = HTTPServer(('127.0.0.1', args.port), ChunkingRequestHandler)
+    print("Running server on port {0}.".format(args.port))
     server.serve_forever()
