@@ -52,7 +52,7 @@ Keep these goals in mind:
 
 ### Submitting your code
 
-We are a Python shop and we're best at understanding code in Python, but if you're more comfortable with a similar dynamic programming language such as Ruby or node.js, you may use that for your code sample.
+We are a Python shop and we're best at understanding code in Python, but if you're more comfortable with a similar programming environment such as Ruby or node.js, you may use that for your code sample.
 
 When your code is ready, package it up and send it to `hiring@luminoso.com`, along with any necessary instructions on how to run it. Please send it only to us, and don't make your code publicly available.
 
