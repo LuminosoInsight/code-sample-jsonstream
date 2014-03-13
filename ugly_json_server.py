@@ -20,7 +20,6 @@ This code will run in Python 2.7 or 3.3, and possibly also in Python 3.2.
 
 import random
 import json
-import math
 import sys
 import argparse
 
@@ -42,7 +41,7 @@ def make_random_characters():
     for surrogates).
     """
     def random_char():
-        if random.randint(0, 9):
+        if random.random() < 0.9:
             return unichr(random.randrange(0, 0xd800))
         else:
             return unichr(random.randrange(0xe000, 0x110000))
@@ -61,7 +60,7 @@ def make_random_scalar():
             '[{"This looks like JSON": "but it\'s actually a string"}]',
             "'", '"', "hello, world", '{', '}', '[',
             ']', "back\\slash", "\\\"\\\\", "\x00", "漢字", -1, 0, 1, 2, 3, 5,
-            8, 0.0, 10000, 2 * math.pi, 6.02e23, 1e-30, True, False, None
+            8, 0.0, 10000, 6.283185, 6.02e23, 1e-30, True, False, None
         ])
 
 
