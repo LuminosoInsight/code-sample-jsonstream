@@ -49,6 +49,7 @@ Keep these goals in mind:
 - Your code should reflect good programming practices, and not do things that are unsafe or needlessly inefficient.
 - Your code should be understandable and pleasant to read.
 
+We expect you to use standard libraries to whatever extent is appropriate. In particular, you should not find it necessary to implement your own JSON parser.
 
 ### Submitting your code
 
