@@ -41,11 +41,14 @@ For testing purposes, you can pass `ugly_json_server.py` command-line arguments 
 
 ### Your task
 
-Your task is to write a client that connects to this server, and prints (on standard output) the pretty version of this ugly JSON stream. Keep in mind that the stream is designed not to end, although you can pass command-line arguments to the server to get finite versions for testing.
+Your task is to write a client that connects to this server, and prints (on standard output) the same data as a pretty JSON stream. You should also include test cases for your client.
+
+Keep in mind that the stream is designed not to end, although you can pass command-line arguments to the server to get finite versions for testing.
 
 Keep these goals in mind:
 
 - Your code should accomplish the task correctly.
+- Your code should have tests that sufficiently demonstrate that it is correct.
 - Your code should reflect good programming practices, and not do things that are unsafe or needlessly inefficient.
 - Your code should be understandable and pleasant to read.
 
