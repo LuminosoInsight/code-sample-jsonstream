@@ -60,4 +60,4 @@ We are a Python shop and we're best at understanding code in Python, but if you'
 
 When your code is ready, package it up and send it to `hiring@luminoso.com`, along with any necessary instructions on how to run it. Please send it only to us, and don't make your code publicly available.
 
-We review code samples anonymously, so please do not put your name in the code itself.
+We review code samples anonymously, so please DO NOT PUT YOUR NAME in any of your files or filenames.
