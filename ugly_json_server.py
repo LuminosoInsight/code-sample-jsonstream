@@ -35,6 +35,15 @@ else:
     from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
 
+if sys.maxunicode < 0x10ffff:
+    raise UnicodeError(
+        "This version of Python is a 'narrow build', which doesn't support "
+        "Unicode characters beyond the first 65536. The server can't run "
+        "because it can't generate its full range of test data. We recommend "
+        "upgrading to Python 3.3 or later, which always has full support for "
+        "Unicode."
+    )
+
 def make_random_characters():
     """
     Return a string of random characters from anywhere in Unicode (except

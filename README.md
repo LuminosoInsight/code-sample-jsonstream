@@ -38,6 +38,10 @@ Running `ugly_json_server.py` will start an HTTP server on port 8001, serving an
 
 For testing purposes, you can pass `ugly_json_server.py` command-line arguments to give it a fixed random seed, or to tell it to end each response after a certain number of objects instead of continuing infinitely. Run `ugly_json_server.py --help` for more information about these command-line arguments.
 
+`ugly_json_server.py` will give you fairly messy data, so that it makes sure to test all the cases that can come up in JSON. One important consequence of this is that you won't be able to run the server if your Python doesn't have full support for Unicode. Some versions of Python 2 for Windows, as well as the version that comes pre-installed on Mac OS, limit their Unicode support to the Basic Multilingual Plane. This is called a "narrow build" of Python.
+
+While the server will run on recent versions of Python 2 or 3, it won't run on a narrow build. If your `sys.maxunicode` is 65535 instead of 1114111, you'll get an error suggesting that you should use Python 3.
+
 
 ### Your task
 
