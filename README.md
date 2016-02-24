@@ -36,32 +36,45 @@ This is an example of a pretty JSON stream with three objects:
 
 Running `ugly_json_server.py` will start an HTTP server on port 8001, serving an infinite stream of random data via the "ugly JSON stream" protocol.
 
-For testing purposes, you can pass `ugly_json_server.py` command-line arguments to give it a fixed random seed, or to tell it to end each response after a certain number of objects instead of continuing infinitely. Run `ugly_json_server.py --help` for more information about these command-line arguments.
-
-`ugly_json_server.py` will give you fairly messy data, so that it makes sure to test all the cases that can come up in JSON. One important consequence of this is that you won't be able to run the server if your Python doesn't have full support for Unicode. Some versions of Python 2 for Windows, as well as the version that comes pre-installed on Mac OS, limit their Unicode support to the Basic Multilingual Plane. This is called a "narrow build" of Python.
+`ugly_json_server.py` will give you fairly messy data, ensuring that your code can handle all the cases that can come up in JSON. One important consequence of this is that you won't be able to run the server if your Python doesn't have full support for Unicode. Some versions of Python 2 for Windows, as well as the version that comes pre-installed on Mac OS, limit their Unicode support to the Basic Multilingual Plane. This is called a "narrow build" of Python.
 
 While the server will run on recent versions of Python 2 or 3, it won't run on a narrow build. If your `sys.maxunicode` is 65535 instead of 1114111, you'll get an error suggesting that you should use Python 3.
 
 
+### Command-line options
+
+Your client should be able to handle the infinite stream, but as part of testing, you may want to end the stream after a certain number of objects. You can do this using the `--limit` command-line option:
+
+    python ugly_json_server.py --limit 100
+
+To get repeatable output from the server, you can also set the random seed:
+
+    python ugly_json_server.py --limit 100 --seed 1
+
+For a summary of the command-line options, run `python ugly_json_server.py --help`.
+
+
 ### Your task
 
-Your task is to write a client that connects to this server, and prints (on standard output) the same data as a pretty JSON stream. You should also include test cases for your client.
+Your task is:
 
-Keep in mind that the stream is designed not to end, although you can pass command-line arguments to the server to get finite versions for testing.
+- Write a client that connects to this server, and prints (on standard output) the same data as a pretty JSON stream.
+- Write test cases that confirm that your client works correctly. (We suggest using a framework such as Python's `unittest`, `py.test`, or `nose` for this.)
 
 Keep these goals in mind:
 
 - Your code should accomplish the task correctly.
-- Your code should have tests that sufficiently demonstrate that it is correct.
+- Your test cases should pass, demonstrating that your code is correct, and they should be specific enough that they would most likely fail if your code were not correct.
 - Your code should reflect good programming practices, and not do things that are unsafe or needlessly inefficient.
 - Your code should be understandable and pleasant to read.
 
-We expect you to use standard libraries to whatever extent is appropriate. In particular, you should not find it necessary to implement your own JSON parser.
+You can use standard libraries to whatever extent is appropriate. In particular, you should not find it necessary to implement your own complete JSON parser.
+
 
 ### Submitting your code
 
 We are a Python shop and we're best at understanding code in Python, but if you're more comfortable with a similar programming environment such as Ruby or node.js, you may use that for your code sample.
 
-When your code is ready, package it up and send it to `hiring@luminoso.com`, along with any necessary instructions on how to run it. Please send it only to us, and don't make your code publicly available.
+When your code is ready, package it up and send it to `hiring@luminoso.com`, along with any necessary instructions on how to run the client and the test cases. Please send it only to us, and don't make your code publicly available.
 
 We review code samples anonymously, so please DO NOT PUT YOUR NAME in any of your files or filenames.
