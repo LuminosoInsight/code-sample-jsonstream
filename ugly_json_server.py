@@ -62,9 +62,9 @@ def make_random_characters():
     """
     def random_char():
         if random.random() < 0.9:
-            return chr(random.randrange(0x20, 0x7f))
+            return unichr(random.randrange(0x20, 0x7f))
         else:
-            return chr(random.choice(SAFE_CODEPOINTS))
+            return unichr(random.choice(SAFE_CODEPOINTS))
     return ''.join(random_char() for i in range(random.randint(1, 4)))
 
 
