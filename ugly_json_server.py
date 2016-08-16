@@ -79,7 +79,7 @@ def make_random_scalar():
             'yes', 'no', 'maybe', ':)', '',
             '[{"This looks like JSON": "but it\'s actually a string"}]',
             "'", '"', "hello, world", '{', '}', '[',
-            ']', "back\\slash", "\\\"\\\\", "\x00", "漢字", -1, 0, 1, 2, 3, 5,
+            ']', "back\\slash", "\\\"\\\\", "漢字", -1, 0, 1, 2, 3, 5,
             8, 0.0, 10000, 6.283185, 6.02e23, 1e-30, True, False, None
         ])
 
