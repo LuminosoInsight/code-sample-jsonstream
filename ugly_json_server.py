@@ -35,25 +35,36 @@ else:
     from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
 
-if sys.maxunicode < 0x10ffff:
-    raise UnicodeError(
-        "This version of Python is a 'narrow build', which doesn't support "
-        "Unicode characters beyond the first 65536. The server can't run "
-        "because it can't generate its full range of test data. We recommend "
-        "upgrading to Python 3.3 or later, which always has full support for "
-        "Unicode."
-    )
+SAFE_CODEPOINTS = (
+    list(range(0x20, 0x7f))
+    # Skip Latin-1 control characters
+    + list(range(0xa0, 0x2028))
+    # Skip line-breaking, word-breaking, and RTL control characters
+    + list(range(0x202f, 0x2060))
+    # Skip more word-breaking and RTL control characters
+    + list(range(0x2070, 0xd800))
+    # Skip surrogates
+    + list(range(0xe000, 0xfdd0))
+    # Skip designated noncharacters
+    + list(range(0xfdf0, 0xfffe))
+    # Don't use characters from outside the Basic Multilingual Plane, to avoid
+    # version issues
+)
+
 
 def make_random_characters():
     """
-    Return a string of random characters from anywhere in Unicode (except
-    for surrogates).
+    Return a string of random 'safe' Unicode codepoints, which should be
+    handled the same by any JSON library on any version of Python, and
+    probably won't mess up your terminal when you print them.
+
+    These codepoints are biased toward ASCII for extra legibility.
     """
     def random_char():
         if random.random() < 0.9:
-            return unichr(random.randrange(0, 0xd800))
+            return chr(random.randrange(0x20, 0x7f))
         else:
-            return unichr(random.randrange(0xe000, 0x110000))
+            return chr(random.choice(SAFE_CODEPOINTS))
     return ''.join(random_char() for i in range(random.randint(1, 4)))
 
 
@@ -65,7 +76,7 @@ def make_random_scalar():
         return make_random_characters()
     else:
         return random.choice([
-            'yes', 'no', 'maybe', ':)', '', '🁵🂊🂇',
+            'yes', 'no', 'maybe', ':)', '',
             '[{"This looks like JSON": "but it\'s actually a string"}]',
             "'", '"', "hello, world", '{', '}', '[',
             ']', "back\\slash", "\\\"\\\\", "\x00", "漢字", -1, 0, 1, 2, 3, 5,

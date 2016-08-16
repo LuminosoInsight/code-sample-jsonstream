@@ -34,11 +34,12 @@ This is an example of a pretty JSON stream with three objects:
 
 ### The server
 
-Running `ugly_json_server.py` will start an HTTP server on port 8001, serving an infinite stream of random data via the "ugly JSON stream" protocol.
+Running `ugly_json_server.py` will start an HTTP server on port 8001, serving an infinite stream of random data via the "ugly JSON stream" protocol. Once it's running, you can look at its output using a command-line HTTP tool such as `curl`:
 
-`ugly_json_server.py` will give you fairly messy data, ensuring that your code can handle all the cases that can come up in JSON. One important consequence of this is that you won't be able to run the server if your Python doesn't have full support for Unicode. Some versions of Python 2 for Windows, as well as the version that comes pre-installed on Mac OS, limit their Unicode support to the Basic Multilingual Plane. This is called a "narrow build" of Python.
+    curl -s localhost:8001
 
-While the server will run on recent versions of Python 2 or 3, it won't run on a narrow build. If your `sys.maxunicode` is 65535 instead of 1114111, you'll get an error suggesting that you should use Python 3.
+`ugly_json_server.py` will give you fairly messy data, ensuring that your code can handle all the cases that can come up in JSON.
+
 
 
 ### Command-line options
