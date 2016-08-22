@@ -69,7 +69,15 @@ Keep these goals in mind:
 - Your code should reflect good programming practices, and not do things that are unsafe or needlessly inefficient.
 - Your code should be understandable and pleasant to read.
 
-You can use standard libraries to whatever extent is appropriate. In particular, you should not find it necessary to implement your own complete JSON parser.
+You can use standard libraries to whatever extent is appropriate.
+
+
+### Resources
+
+We'd rather you be able to focus on the core problem here, rather than getting stuck on lower-level details. In that spirit, we offer these two hints:
+
+* Python's built in [`JSONDecoder.raw_decode()`](https://docs.python.org/3/library/json.html#json.JSONDecoder.raw_decode) method can be used to find a single JSON document at the beginning of a longer string.
+* The [Requests](http://www.python-requests.org/) library (available through PyPI) [makes it easy](http://docs.python-requests.org/en/master/user/quickstart/#raw-response-content) to iterate over a streaming HTTP response. 
 
 
 ### Submitting your code
